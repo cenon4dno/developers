@@ -23,7 +23,6 @@ Other browser not tested but assumed working.
 
 Installation:
 =============
-
 Just drop in your Apache DocumentRoot and run index.php.
 
 
