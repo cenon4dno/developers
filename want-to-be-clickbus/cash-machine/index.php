@@ -19,23 +19,29 @@ $arrNotesAvailable = array(100,50,20,10);
 $arrResults = array();
 $bPost = false;
 $bEmpty = false;
+$bError = false;
 
 // Check if POST is present
 if (isset($_POST['amount'])) {
 
-    if (is_numeric($_POST['amount'])) {
-        $arrResults = computeNotes($_POST['amount'], $arrNotesAvailable);
-    } else {
-        // Invalid character check except the word NULL
-        if (strtolower($_POST['amount']) == 'null') {
-            $bEmpty = true;
-        } else {
-            throw new Exception('InputNotANumberException');
-        }
-    }
-
     // Set true to tell the page that it has a POST
     $bPost = true;
+
+    try {
+        if (is_numeric($_POST['amount'])) {
+            $arrResults = computeNotes($_POST['amount'], $arrNotesAvailable);
+        } else {
+            // Invalid character check except the word NULL
+            if (strtolower($_POST['amount']) == 'null') {
+                $bEmpty = true;
+            } else {
+                throw new Exception('InputNotANumberException');
+            }
+        }
+    } catch (Exception $e) {
+        $strError = 'Caught exception: ' . $e->getMessage() . "\n";
+        $bError = true;
+    }
 }
 
 /**
@@ -159,7 +165,7 @@ function displayDenomination($arrResults) {
                     <input type="submit" value="withdraw" />
                 </form>
             </div>
-            <?php if ($bPost) :?>
+            <?php if ($bPost && !$bError) :?>
             <div>
                 <strong>Money Withdrawn: </strong><br />
                 <?php
@@ -178,6 +184,9 @@ function displayDenomination($arrResults) {
                 ?>
                 <?php endif; ?>
             </div>
+            <?php elseif ($bError): ?>
+            <strong>Error: </strong><br />
+            <?php echo $strError; ?>
             <?php endif; ?>
         </div>
     </body>
